@@ -31,9 +31,12 @@ export const Select: React.FC<SelectProps> = ({
       )}
       <select
         id={selectId}
-        className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm ${
-          error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''
+       className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm placeholder-gray-400 ${
+          error 
+            ? 'border-red-300 focus:border-red-500 focus:ring-red-500 text-red-900' 
+            : 'text-gray-900'
         } ${className}`}
+        {...props}
         {...props}
       >
         {options.map((option) => (
