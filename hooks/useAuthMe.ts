@@ -17,10 +17,10 @@ export const useAuthMe = () => {
     },
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: (failureCount, error: unknown) => {
-      // No reintentar si es error de autenticación
+      // No reintentar si es error de autenticación o autorización
       if (error instanceof Error && 'response' in error) {
         const axiosError = error as { response: { status: number } };
-        if (axiosError.response?.status === 401) {
+        if (axiosError.response?.status === 401 || axiosError.response?.status === 403) {
           return false;
         }
       }
@@ -31,7 +31,7 @@ export const useAuthMe = () => {
 
 // Hook para verificar permisos específicos
 export const usePermissions = () => {
-  const { data } = useAuthMe();
+  const { data, error } = useAuthMe();
   
   const hasCapability = (capability: string): boolean => {
     return data?.permissions?.capabilities?.includes(capability) || false;
@@ -49,14 +49,54 @@ export const usePermissions = () => {
     return data?.permissions?.role === role;
   };
 
+  // Verificar si es un usuario sin permisos (role USER y sin capabilities)
+  const isUserWithoutPermissions = (): boolean => {
+    // Si hay error 403, es probable que sea un usuario sin permisos
+    if (error && typeof error === 'object' && error !== null && 'response' in error) {
+      const axiosError = error as { response: { status: number } };
+      if (axiosError.response?.status === 403) {
+        return true;
+      }
+    }
+    
+    // También verificar por role y capabilities vacías
+    const isUser = isRole('USER');
+    const hasNoCapabilities = !data?.permissions?.capabilities || data.permissions.capabilities.length === 0;
+    return isUser && hasNoCapabilities;
+  };
+
+  // Función helper para debug - verificar si debería tener acceso a algo
+  const shouldHaveAccess = (requiredCapabilities: string[] = [], requiredRoles: string[] = []): boolean => {
+    // Si es ADMIN, siempre debería tener acceso (a menos que esté explícitamente restringido)
+    if (isRole('ADMIN')) {
+      return true;
+    }
+    
+    // Verificar roles
+    if (requiredRoles.length > 0) {
+      const hasRole = requiredRoles.some(role => isRole(role));
+      if (hasRole) return true;
+    }
+    
+    // Verificar capabilities
+    if (requiredCapabilities.length > 0) {
+      return hasAnyCapability(requiredCapabilities);
+    }
+    
+    return false;
+  };
+
   return {
     permissions: data?.permissions,
     hasCapability,
     hasAnyCapability,
     hasAllCapabilities,
     isRole,
+    isUserWithoutPermissions,
+    shouldHaveAccess,
     isAdmin: isRole('ADMIN'),
     isAccountant: isRole('ACCOUNTANT'),
     isDriver: isRole('DRIVER'),
+    error,
   };
 };

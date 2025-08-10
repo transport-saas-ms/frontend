@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { LoginCredentials, RegisterData, AuthResponse, ApiError } from '@/lib/types';
 import { authKeys } from './useAuthMe';
 
@@ -12,6 +13,11 @@ export const useLogin = () => {
   const router = useRouter();
   const queryClient = useQueryClient();
   const { setAuth, setUserProfile } = useAuthStore();
+  const { handleError, is400Error } = useErrorHandler({
+    customMessages: {
+      400: 'Los datos de inicio de sesión no son válidos.',
+    },
+  });
 
   return useMutation({
     mutationFn: async (credentials: LoginCredentials): Promise<AuthResponse> => {
@@ -47,8 +53,14 @@ export const useLogin = () => {
       }
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al iniciar sesión';
-      toast.error(message);
+      // Si es un error de validación (400), usar el manejador específico
+      if (is400Error(error)) {
+        handleError(error);
+      } else {
+        // Para otros errores, usar el mensaje del servidor o uno genérico
+        const message = error.response?.data?.message || 'Error al iniciar sesión';
+        toast.error(message);
+      }
     },
   });
 };
@@ -56,6 +68,11 @@ export const useLogin = () => {
 // Hook para registro
 export const useRegister = () => {
   const router = useRouter();
+  const { handleError, is400Error, getValidationErrors, isWeakPasswordError } = useErrorHandler({
+    customMessages: {
+      400: 'Los datos proporcionados no son válidos.',
+    },
+  });
 
   return useMutation({
     mutationFn: async (data: RegisterData): Promise<AuthResponse> => {
@@ -67,8 +84,24 @@ export const useRegister = () => {
       router.push('/login');
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al crear la cuenta';
-      toast.error(message);
+      // Si es un error de validación (400), usar el manejador específico
+      if (is400Error(error)) {
+        // Si es específicamente un error de contraseña débil
+        if (isWeakPasswordError(error)) {
+          const validationErrors = getValidationErrors(error);
+          const passwordError = validationErrors.find(err => 
+            err.toLowerCase().includes('password')
+          );
+          toast.error(passwordError || 'La contraseña no cumple con los requisitos de seguridad.');
+        } else {
+          // Usar el manejador general para otros errores 400
+          handleError(error);
+        }
+      } else {
+        // Para otros errores, usar el mensaje del servidor o uno genérico
+        const message = error.response?.data?.message || 'Error al crear la cuenta';
+        toast.error(message);
+      }
     },
   });
 };

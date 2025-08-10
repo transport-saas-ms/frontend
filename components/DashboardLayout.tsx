@@ -5,7 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { useLogout } from '@/hooks/useAuth';
+import { usePermissions } from '@/hooks/useAuthMe';
 import { Button } from '@/components/ui/Button';
+import { NoPermissionsView } from '@/components/NoPermissionsView';
+import { ForbiddenError } from '@/components/ForbiddenError';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
+import { PermissionsDebugger } from '@/components/dev/PermissionsDebugger';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: '🏠' },
@@ -19,10 +24,37 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
   const logout = useLogout();
+  const { isUserWithoutPermissions, permissions, error } = usePermissions();
 
   const handleLogout = () => {
     logout.mutate();
   };
+
+  // Mostrar loading mientras se cargan los permisos
+  if (permissions === undefined && !error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
+
+  // Si hay un error 403 específico del servidor
+  if (error && typeof error === 'object' && error !== null && 'response' in error) {
+    const axiosError = error as { response: { status: number } };
+    if (axiosError.response?.status === 403) {
+      return (
+        <ForbiddenError 
+          message="No tienes permisos para acceder al dashboard. Espera a ser agregado a una compañía."
+        />
+      );
+    }
+  }
+
+  // Si es un usuario sin permisos, mostrar vista específica
+  if (isUserWithoutPermissions()) {
+    return <NoPermissionsView />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,6 +136,9 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
           {children}
         </div>
       </main>
+
+      {/* Debugger de permisos (solo en desarrollo) */}
+      <PermissionsDebugger />
     </div>
   );
 };

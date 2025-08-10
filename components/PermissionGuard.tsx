@@ -18,11 +18,16 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
   roles = [],
   fallback = null,
 }) => {
-  const { hasAnyCapability, hasAllCapabilities, isRole, permissions } = usePermissions();
+  const { hasAnyCapability, hasAllCapabilities, isRole, permissions, isAdmin } = usePermissions();
 
   // Si no hay permisos cargados aún, no mostrar nada
   if (!permissions) {
     return <>{fallback}</>;
+  }
+
+  // Los ADMIN tienen acceso a todo por defecto (a menos que se especifique lo contrario)
+  if (isAdmin && roles.length === 0) {
+    return <>{children}</>;
   }
 
   // Verificar roles si se especificaron
@@ -33,8 +38,8 @@ export const PermissionGuard: React.FC<PermissionGuardProps> = ({
     }
   }
 
-  // Verificar capabilities si se especificaron
-  if (capabilities.length > 0) {
+  // Verificar capabilities si se especificaron (y no es ADMIN con acceso automático)
+  if (capabilities.length > 0 && !(isAdmin && roles.length === 0)) {
     const hasPermission = requireAll 
       ? hasAllCapabilities(capabilities)
       : hasAnyCapability(capabilities);

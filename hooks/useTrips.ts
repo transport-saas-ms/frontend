@@ -3,6 +3,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import api from '@/lib/api';
+import { useErrorHandler } from '@/hooks/useErrorHandler';
 import { 
   Trip, 
   CreateTripData, 
@@ -99,6 +100,12 @@ export const useTripWithExpenses = (id: string) => {
 export const useCreateTrip = () => {
   const queryClient = useQueryClient();
   const router = useRouter();
+  const { handleError, is403Error } = useErrorHandler({
+    show403Toast: true,
+    customMessages: {
+      403: 'No tienes permisos para crear viajes. Contacta al administrador.',
+    },
+  });
 
   return useMutation({
     mutationFn: async (data: CreateTripData): Promise<Trip> => {
@@ -111,8 +118,14 @@ export const useCreateTrip = () => {
       router.push(`/trips/${data.id}`);
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al crear el viaje';
-      toast.error(message);
+      // Si es error 403, usar el manejador personalizado
+      if (is403Error(error)) {
+        handleError(error);
+      } else {
+        // Para otros errores, usar el mensaje del servidor o uno genérico
+        const message = error.response?.data?.message || 'Error al crear el viaje';
+        toast.error(message);
+      }
     },
   });
 };
