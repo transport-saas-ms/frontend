@@ -57,7 +57,7 @@ export interface Trip {
   completedAt?: string;
   startDate?: string; // Para compatibilidad con la versión anterior
   endDate?: string;   // Para compatibilidad con la versión anterior
-  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   driverId: string;
   companyId: string;
   createdBy: string;
@@ -95,7 +95,7 @@ export interface UpdateTripData {
   distance?: number;
   startDate?: string;
   endDate?: string;
-  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   driverId?: string;
   vehicleId?: string;
 }
@@ -184,7 +184,7 @@ export interface ExpensesResponse {
 
 // Tipos para filtros
 export interface TripFilters {
-  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  status?: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   driverId?: string;
   startDate?: string;
   endDate?: string;

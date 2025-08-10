@@ -8,7 +8,7 @@ import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
-import { DeleteTripButton } from '@/components/trips/DeleteTripButton';
+import { TripStatusSelect } from '@/components/trips/TripStatusSelect';
 import { formatExpensesTotal } from '@/lib/expenseUtils';
 
 export const TripsList: React.FC = () => {
@@ -43,7 +43,6 @@ export const TripsList: React.FC = () => {
       PENDING: { color: 'bg-yellow-100 text-yellow-800', label: 'Pendiente' },
       IN_PROGRESS: { color: 'bg-blue-100 text-blue-800', label: 'En progreso' },
       COMPLETED: { color: 'bg-green-100 text-green-800', label: 'Completado' },
-    //   CANCELLED: { color: 'bg-red-100 text-red-800', label: 'Cancelado' },
     };
 
     const config = statusConfig[status as keyof typeof statusConfig];
@@ -163,13 +162,12 @@ export const TripsList: React.FC = () => {
                     </Link>
                   </div>
                   
-                  {/* Botón de eliminar */}
+                  {/* Select de estado del viaje */}
                   <div className="ml-4 flex-shrink-0">
-                    <DeleteTripButton 
+                    <TripStatusSelect 
                       trip={trip}
-                      buttonSize="sm"
-                      buttonVariant="ghost"
-                      showIcon={true}
+                      size="sm"
+                      showLabel={false}
                     />
                   </div>
                 </div>

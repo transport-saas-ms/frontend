@@ -171,3 +171,49 @@ export const useDeleteTrip = () => {
     },
   });
 };
+
+// Hook para acciones de estado de viaje
+export const useTripStatusActions = (tripId: string) => {
+  const queryClient = useQueryClient();
+
+  const startTrip = useMutation({
+    mutationFn: async (): Promise<Trip> => {
+      const response = await api.post(`/trips/${tripId}/start`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
+      queryClient.invalidateQueries({ queryKey: tripKeys.withExpenses(tripId) });
+      toast.success('Viaje iniciado exitosamente');
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error.response?.data?.message || 'Error al iniciar el viaje';
+      toast.error(message);
+    },
+  });
+
+  const completeTrip = useMutation({
+    mutationFn: async (): Promise<Trip> => {
+      const response = await api.post(`/trips/${tripId}/complete`);
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
+      queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
+      queryClient.invalidateQueries({ queryKey: tripKeys.withExpenses(tripId) });
+      toast.success('Viaje completado exitosamente');
+    },
+    onError: (error: AxiosError<ApiError>) => {
+      const message = error.response?.data?.message || 'Error al completar el viaje';
+      toast.error(message);
+    },
+  });
+
+  return {
+    startTrip,
+    completeTrip,
+    isStarting: startTrip.isPending,
+    isCompleting: completeTrip.isPending,
+  };
+};
