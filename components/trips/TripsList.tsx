@@ -23,7 +23,6 @@ export const TripsList: React.FC = () => {
     { value: 'PENDING', label: 'Pendiente' },
     { value: 'IN_PROGRESS', label: 'En progreso' },
     { value: 'COMPLETED', label: 'Completado' },
-    { value: 'CANCELLED', label: 'Cancelado' },
   ];
 
   const handleFilterChange = (key: keyof TripFilters, value: string | number) => {

@@ -31,7 +31,7 @@ export const Select: React.FC<SelectProps> = ({
       )}
       <select
         id={selectId}
-       className={`block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm placeholder-gray-400 ${
+       className={`block w-full mt-3 px-2 py-2 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm placeholder-gray-400 ${
           error 
             ? 'border-red-300 focus:border-red-500 focus:ring-red-500 text-red-900' 
             : 'text-gray-900'
@@ -39,8 +39,8 @@ export const Select: React.FC<SelectProps> = ({
         {...props}
         {...props}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
+        {options.map((option, index) => (
+          <option key={option.value || `option-${index}`} value={option.value}>
             {option.label}
           </option>
         ))}

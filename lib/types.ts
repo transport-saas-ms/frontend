@@ -80,12 +80,13 @@ export interface ExpenseByCurrency {
 }
 
 export interface CreateTripData {
+  title: string;
+  description?: string;
   origin: string;
   destination: string;
-  distance: number;
-  startDate: string;
+  scheduledDate: string;
   driverId: string;
-  vehicleId: string;
+  companyId: string;
 }
 
 export interface UpdateTripData {
