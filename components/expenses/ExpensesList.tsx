@@ -10,6 +10,7 @@ import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
+import { DeleteExpenseButton } from '@/components/expenses/DeleteExpenseButton';
 
 export const ExpensesList: React.FC = () => {
   const [filters, setFilters] = useState<ExpenseFilters>({
@@ -22,10 +23,9 @@ export const ExpensesList: React.FC = () => {
   const categoryOptions = [
     { value: '', label: 'Todas las categorías' },
     { value: 'FUEL', label: 'Combustible' },
-    { value: 'MAINTENANCE', label: 'Mantenimiento' },
-    { value: 'TOLLS', label: 'Peajes' },
+    { value: 'TOLL', label: 'Peajes' },
     { value: 'FOOD', label: 'Comida' },
-    { value: 'ACCOMMODATION', label: 'Alojamiento' },
+    { value: 'RAPAIR', label: 'Arreglos' },
     { value: 'OTHER', label: 'Otro' },
   ];
 
@@ -138,15 +138,15 @@ export const ExpensesList: React.FC = () => {
             {data.expenses.map((expense) => (
               <li key={expense.id} className="px-4 py-4 sm:px-6">
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center">
+                  <div className="flex items-center min-w-0 flex-1">
                     <div className="flex-shrink-0">
                       <div className="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
                         <span className="text-green-600 font-medium">$</span>
                       </div>
                     </div>
-                    <div className="ml-4">
+                    <div className="ml-4 min-w-0 flex-1">
                       <div className="flex items-center">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-gray-900 truncate">
                           {expense.description}
                         </p>
                         <div className="ml-2">
@@ -172,7 +172,7 @@ export const ExpensesList: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center">
+                  <div className="flex items-center space-x-4">
                     <p className="text-lg font-semibold text-gray-900">
                       {formatCurrency(safeNumber(expense.amount))}
                     </p>
@@ -181,7 +181,7 @@ export const ExpensesList: React.FC = () => {
                         href={expense.receiptUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="ml-2 text-blue-600 hover:text-blue-800"
+                        className="text-blue-600 hover:text-blue-800"
                       >
                         <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
                           <path
@@ -192,6 +192,12 @@ export const ExpensesList: React.FC = () => {
                         </svg>
                       </a>
                     )}
+                    <DeleteExpenseButton 
+                      expense={expense}
+                      buttonSize="sm"
+                      buttonVariant="ghost"
+                      showIcon={true}
+                    />
                   </div>
                 </div>
               </li>

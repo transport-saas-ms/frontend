@@ -163,7 +163,6 @@ export const useDeleteTrip = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-      toast.success('Viaje eliminado exitosamente');
       router.push('/trips');
     },
     onError: (error: AxiosError<ApiError>) => {

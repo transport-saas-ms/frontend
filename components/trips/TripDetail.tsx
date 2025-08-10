@@ -3,12 +3,13 @@
 import React from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useTripWithExpenses, useDeleteTrip } from '@/hooks/useTrips';
+import { useTripWithExpenses } from '@/hooks/useTrips';
 import { useAuthStore } from '@/store/auth';
 import { formatCurrency, formatDate, formatDateTime, safeNumber } from '@/lib/utils';
 import { formatExpensesTotal } from '@/lib/expenseUtils';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
+import { DeleteTripButton } from '@/components/trips/DeleteTripButton';
 
 export const TripDetail: React.FC = () => {
   const params = useParams();
@@ -16,13 +17,6 @@ export const TripDetail: React.FC = () => {
   const tripId = params.id as string;
 
   const { data: trip, isLoading, error } = useTripWithExpenses(tripId);
-  const deleteTrip = useDeleteTrip();
-
-  const handleDelete = () => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar este viaje?')) {
-      deleteTrip.mutate(tripId);
-    }
-  };
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -123,13 +117,11 @@ export const TripDetail: React.FC = () => {
             </Link>
           )}
           {canDelete && (
-            <Button
-              variant="danger"
-              onClick={handleDelete}
-              loading={deleteTrip.isPending}
-            >
-              Eliminar
-            </Button>
+            <DeleteTripButton 
+              trip={trip}
+              buttonVariant="danger"
+              showIcon={false}
+            />
           )}
         </div>
       </div>

@@ -8,6 +8,7 @@ import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
+import { DeleteTripButton } from '@/components/trips/DeleteTripButton';
 import { formatExpensesTotal } from '@/lib/expenseUtils';
 
 export const TripsList: React.FC = () => {
@@ -115,56 +116,63 @@ export const TripsList: React.FC = () => {
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
             {data.trips.map((trip: Trip) => (
-              <li key={trip.id}>
-                <Link
-                  href={`/trips/${trip.id}`}
-                  className="block hover:bg-gray-50 px-4 py-4 sm:px-6"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <div className="flex-shrink-0">
-                        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                          <span className="text-blue-600 font-medium">
-                            {trip.title[0]?.toUpperCase()}
-                          </span>
-                        </div>
-                      </div>
-                      <div className="ml-4">
-                        <div className="flex items-center">
-                          <p className="text-sm font-medium text-gray-900">
-                            {trip.title}
-                          </p>
-                          <div className="ml-2">
-                            {getStatusBadge(trip.status)}
+              <li key={trip.id} className="bg-white">
+                <div className="px-4 py-4 flex items-center justify-between">
+                  <div className="min-w-0 flex-1">
+                    <Link href={`/trips/${trip.id}`} className="block hover:bg-gray-50 transition-colors rounded-lg px-4 py-2 -mx-4 -my-2">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0">
+                          <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                            <span className="text-blue-600 font-medium">
+                              {trip.title[0]?.toUpperCase()}
+                            </span>
                           </div>
                         </div>
-                        <div className="mt-1">
-                          <p className="text-xs text-gray-500">
-                            {trip.distance ? `${trip.distance} km • ` : ''}
-                            {trip.startDate ? new Date(trip.startDate).toLocaleDateString() : ''}
-                            {trip.driver && ` • ${trip.driver.name}`}
-                          </p>
+                        <div className="ml-4 min-w-0 flex-1">
+                          <div className="flex items-center">
+                            <p className="text-sm font-medium text-gray-900 truncate">
+                              {trip.title}
+                            </p>
+                            <div className="ml-2">
+                              {getStatusBadge(trip.status)}
+                            </div>
+                          </div>
+                          <div className="mt-1">
+                            <p className="text-xs text-gray-500">
+                              {trip.distance ? `${trip.distance} km • ` : ''}
+                              {trip.startDate ? new Date(trip.startDate).toLocaleDateString() : ''}
+                              {trip.driver && ` • ${trip.driver.name}`}
+                            </p>
+                          </div>
                         </div>
+                        <div className="flex items-center text-sm text-gray-500 mr-4">
+                          {trip.expenses ? formatExpensesTotal(trip.expenses) : '$0.00'}
+                        </div>
+                        <svg
+                          className="h-5 w-5 text-gray-400"
+                          fill="currentColor"
+                          viewBox="0 0 20 20"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
                       </div>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="text-sm text-gray-500">
-                        {trip.expenses ? formatExpensesTotal(trip.expenses) : '$0.00'}
-                      </p>
-                      <svg
-                        className="ml-2 h-5 w-5 text-gray-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </div>
+                    </Link>
                   </div>
-                </Link>
+                  
+                  {/* Botón de eliminar */}
+                  <div className="ml-4 flex-shrink-0">
+                    <DeleteTripButton 
+                      trip={trip}
+                      buttonSize="sm"
+                      buttonVariant="ghost"
+                      showIcon={true}
+                    />
+                  </div>
+                </div>
               </li>
             ))}
           </ul>
