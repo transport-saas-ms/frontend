@@ -26,6 +26,21 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
   const logout = useLogout();
   const { isUserWithoutPermissions, permissions, error } = usePermissions();
 
+  // Agregar "Usuarios" solo para ADMIN
+  const getNavigationItems = () => {
+    const baseNavigation = [...navigation];
+    
+    if (user?.role === 'ADMIN') {
+      baseNavigation.push({ 
+        name: 'Usuarios', 
+        href: '/users', 
+        icon: '👥' 
+      });
+    }
+    
+    return baseNavigation;
+  };
+
   const handleLogout = () => {
     logout.mutate();
   };
@@ -69,7 +84,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({
                 </h1>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                {navigation.map((item) => {
+                {getNavigationItems().map((item) => {
                   const isActive = pathname.startsWith(item.href);
                   return (
                     <Link

@@ -1,21 +1,5 @@
-import { UserRole, Company } from './common';
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role: UserRole;
-  companyId: string;
-  company: Company;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-export interface UserPermissions {
-  role: string;
-  capabilities: string[];
-  restrictions: string[];
-}
+import { UserRole } from './common';
+import { User, UserPermissions } from './user';
 
 export interface AuthMeResponse {
   user: User;

@@ -7,8 +7,8 @@ export * from './common';
 // Tipos de autenticación
 export * from './auth';
 
-// Tipos de vehículos
-export * from './vehicle';
+// Tipos de usuarios
+export * from './user';
 
 // Tipos de viajes
 export * from './trip';
