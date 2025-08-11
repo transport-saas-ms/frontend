@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { User, UserPermissions } from '@/lib/types';
+import { User, UserPermissions } from '@/lib/types/index';
 import { setCookie, deleteCookie } from '@/lib/cookies';
 
 interface AuthState {

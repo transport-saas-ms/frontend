@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useExpenses } from '@/hooks/useExpenses';
-import { ExpenseFilters } from '@/lib/types';
+import { ExpenseFilters } from '@/lib/types/index';
 import { formatCurrency, formatDate, safeNumber } from '@/lib/utils';
 import { formatExpensesTotal } from '@/lib/expenseUtils';
 import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';

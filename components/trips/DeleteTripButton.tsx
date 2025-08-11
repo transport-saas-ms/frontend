@@ -3,7 +3,7 @@
 import React from 'react';
 import { useDeleteTrip } from '@/hooks/useTrips';
 import { DeleteButton } from '@/components/ui/DeleteButton';
-import { Trip } from '@/lib/types';
+import { Trip } from '@/lib/types/index';
 
 interface DeleteTripButtonProps {
   trip: Trip;

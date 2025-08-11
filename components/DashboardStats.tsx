@@ -6,7 +6,7 @@ import { useExpenses } from '@/hooks/useExpenses';
 import { useAuthStore } from '@/store/auth';
 import { formatCurrencyWithCode } from '@/lib/utils';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
-import { Trip, ExpenseByCurrency } from '@/lib/types';
+import { Trip, ExpenseByCurrency } from '@/lib/types/index';
 
 export const DashboardStats: React.FC = () => {
   const user = useAuthStore((state) => state.user);

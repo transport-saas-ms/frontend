@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
 import { useLogin } from '@/hooks/useAuth';
-import { LoginCredentials } from '@/lib/types';
+import { LoginCredentials } from '@/lib/types/index';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 

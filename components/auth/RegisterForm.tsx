@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import Link from 'next/link';
 import { useRegister } from '@/hooks/useAuth';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { RegisterData } from '@/lib/types';
+import { RegisterData } from '@/lib/types/index';
 
 interface RegisterFormData extends RegisterData {
   confirmPassword: string;

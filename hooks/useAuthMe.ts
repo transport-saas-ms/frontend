@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { AuthMeResponse } from '@/lib/types';
+import { AuthMeResponse } from '@/lib/types/index';
 
 // Key para React Query
 export const authKeys = {

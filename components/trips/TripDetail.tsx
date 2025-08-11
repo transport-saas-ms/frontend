@@ -166,14 +166,6 @@ export const TripDetail: React.FC = () => {
                 {trip.driver?.name || 'No asignado'}
               </dd>
             </div>
-            {trip.vehicle && (
-              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                <dt className="text-sm font-medium text-gray-500">Vehículo</dt>
-                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {`${trip.vehicle.brand} ${trip.vehicle.model} (${trip.vehicle.plate})`}
-                </dd>
-              </div>
-            )}
             {trip.startDate && (
               <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">Fecha de inicio</dt>

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCreateTrip, useUpdateTrip } from '@/hooks/useTrips';
 import { useCompanyUsers } from '@/hooks/useCompany';
 import { useAuthStore } from '@/store/auth';
-import { Trip } from '@/lib/types';
+import { Trip } from '@/lib/types/index';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';

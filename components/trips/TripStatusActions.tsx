@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Trip } from '@/lib/types';
+import { Trip } from '@/lib/types/index';
 import { Button } from '@/components/ui/Button';
 import { useTripStatusActions } from '@/hooks/useTrips';
 

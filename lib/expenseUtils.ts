@@ -1,4 +1,4 @@
-import { Expense } from '@/lib/types';
+import { Expense } from '@/lib/types/index';
 import { safeNumber, formatCurrencyWithCode } from '@/lib/utils';
 
 /**

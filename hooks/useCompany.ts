@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import api from '@/lib/api';
-import { User } from '@/lib/types';
+import { User } from '@/lib/types/index';
 
 // Hook para obtener usuarios de una empresa
 export const useCompanyUsers = (companyId: string) => {

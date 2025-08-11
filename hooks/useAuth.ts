@@ -5,7 +5,7 @@ import { AxiosError } from 'axios';
 import api from '@/lib/api';
 import { useAuthStore } from '@/store/auth';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { LoginCredentials, RegisterData, AuthResponse, ApiError } from '@/lib/types';
+import { LoginCredentials, RegisterData, AuthResponse, ApiError } from '@/lib/types/index';
 import { authKeys } from './useAuthMe';
 
 // Hook para login

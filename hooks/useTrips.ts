@@ -12,7 +12,7 @@ import {
   TripsResponse,
   TripsWithExpensesResponse, 
   ApiError 
-} from '@/lib/types';
+} from '@/lib/types/index';
 
 // Keys para React Query
 export const tripKeys = {

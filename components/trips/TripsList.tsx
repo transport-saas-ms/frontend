@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useTripsWithExpenses } from '@/hooks/useTrips';
-import { TripFilters, Trip } from '@/lib/types';
+import { TripFilters, Trip } from '@/lib/types/index';
 import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';

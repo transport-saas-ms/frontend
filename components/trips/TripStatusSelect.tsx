@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Trip } from '@/lib/types';
+import { Trip } from '@/lib/types/index';
 import { Select } from '@/components/ui/Select';
 import { useTripStatusActions } from '@/hooks/useTrips';
 

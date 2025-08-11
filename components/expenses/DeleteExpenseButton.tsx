@@ -3,7 +3,7 @@
 import React from 'react';
 import { useDeleteExpense } from '@/hooks/useExpenses';
 import { DeleteButton } from '@/components/ui/DeleteButton';
-import { Expense } from '@/lib/types';
+import { Expense } from '@/lib/types/index';
 
 interface DeleteExpenseButtonProps {
   expense: Expense;
