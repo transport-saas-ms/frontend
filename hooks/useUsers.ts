@@ -24,14 +24,16 @@ export const useUsers = (filters: UserFilters = {}) => {
   return useQuery({
     queryKey: userKeys.usersList(filters),
     queryFn: async (): Promise<UsersResponse> => {
-      const response = await api.get<UsersResponse>("/users", {
-        params: {
-          page: filters.page || 1,
-          limit: filters.limit || 10,
-          ...(filters.role && { role: filters.role }),
-          ...(filters.search && { search: filters.search }),
-        },
-      });
+      const params = {
+        page: filters.page || 1,
+        limit: filters.limit || 10,
+        ...(filters.role && { role: filters.role }),
+        ...(filters.search && { search: filters.search }),
+      };
+      
+      console.log('Filters being sent to API:', params);
+      
+      const response = await api.get<UsersResponse>('/users', { params });
       return response.data;
     },
     staleTime: 5 * 60 * 1000, // 5 minutos

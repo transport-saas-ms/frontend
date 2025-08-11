@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUsers } from '@/hooks/useUsers';
 import { UserFilters, UserRole } from '@/lib/types/index';
@@ -10,20 +10,58 @@ import { Input } from '@/components/ui/Input';
 import { UserRoleSelect } from '@/components/users/UserRoleSelect';
 import { DeleteUserButton } from '@/components/users/DeleteUserButton';
 
+// Hook para debouncing
+const useDebounce = (value: string, delay: number) => {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
+};
+
 export const UsersList: React.FC = () => {
   const [filters, setFilters] = useState<UserFilters>({
     page: 1,
     limit: 10,
   });
 
+  // Estado local para el input de búsqueda (para UI responsiva)
+  const [searchInput, setSearchInput] = useState('');
+  
+  // Debounce del search para evitar requests excesivos
+  const debouncedSearch = useDebounce(searchInput, 1000);
+
+  // Aplicar el search debounced a los filtros
+  useEffect(() => {
+    setFilters(prev => ({
+      ...prev,
+      search: debouncedSearch || undefined,
+      page: 1, // Reset page when searching
+    }));
+  }, [debouncedSearch]);
+
   const { data, isLoading, error } = useUsers(filters);
 
   const handleFilterChange = (key: keyof UserFilters, value: string | number) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value === '' ? undefined : value,
-      page: 1, // Reset page when filtering
-    }));
+    if (key === 'search') {
+      // Para search, solo actualizar el input local
+      setSearchInput(value as string);
+    } else {
+      // Para otros filtros, actualizar inmediatamente
+      setFilters(prev => ({
+        ...prev,
+        [key]: value === '' ? undefined : value,
+        page: 1, // Reset page when filtering
+      }));
+    }
   };
 
   const handlePageChange = (page: number) => {
@@ -90,7 +128,7 @@ export const UsersList: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <Input
             placeholder="Buscar por nombre o email..."
-            value={filters.search || ''}
+            value={searchInput}
             onChange={(e) => handleFilterChange('search', e.target.value)}
           />
           <UserRoleSelect

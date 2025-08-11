@@ -221,48 +221,50 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
         isOpen={showPasswordModal} 
         onClose={closePasswordModal}
       >
-        <div className="space-y-4">
-          <h3 className="text-lg font-medium text-gray-900">Cambiar contraseña</h3>
-          <p className="text-sm text-gray-600">
-            Establece una nueva contraseña para <strong>{user?.name || 'el usuario'}</strong>
-          </p>
-          
-          <Input
-            label="Nueva contraseña"
-            type="password"
-            value={passwordData.newPassword}
-            onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-            placeholder="Mínimo 8 caracteres"
-            disabled={changePassword.isPending}
-          />
-          
-          <Input
-            label="Confirmar nueva contraseña"
-            type="password"
-            value={passwordData.confirmPassword}
-            onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-            placeholder="Repite la nueva contraseña"
-            disabled={changePassword.isPending}
-          />
-          
-          <ValidationErrors errors={passwordErrors} />
-          
-          <div className="flex space-x-3 pt-4">
-            <Button
-              onClick={handleChangePassword}
-              loading={changePassword.isPending}
+        <div className="p-6">
+          <div className="space-y-4">
+            <h3 className="text-lg font-medium text-gray-900">Cambiar contraseña</h3>
+            <p className="text-sm text-gray-600">
+              Establece una nueva contraseña para <strong>{user?.name || 'el usuario'}</strong>
+            </p>
+            
+            <Input
+              label="Nueva contraseña"
+              type="password"
+              value={passwordData.newPassword}
+              onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+              placeholder="Mínimo 8 caracteres"
               disabled={changePassword.isPending}
-              className="flex-1"
-            >
-              Cambiar contraseña
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={closePasswordModal}
+            />
+            
+            <Input
+              label="Confirmar nueva contraseña"
+              type="password"
+              value={passwordData.confirmPassword}
+              onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+              placeholder="Repite la nueva contraseña"
               disabled={changePassword.isPending}
-            >
-              Cancelar
-            </Button>
+            />
+            
+            <ValidationErrors errors={passwordErrors} />
+            
+            <div className="flex space-x-3 pt-4">
+              <Button
+                onClick={handleChangePassword}
+                loading={changePassword.isPending}
+                disabled={changePassword.isPending}
+                className="flex-1"
+              >
+                Cambiar contraseña
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={closePasswordModal}
+                disabled={changePassword.isPending}
+              >
+                Cancelar
+              </Button>
+            </div>
           </div>
         </div>
       </Modal>
