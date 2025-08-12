@@ -29,9 +29,9 @@ export const useUsers = (filters: UserFilters = {}) => {
         limit: filters.limit || 10,
         ...(filters.role && { role: filters.role }),
         ...(filters.search && { search: filters.search }),
+        ...(filters.sortBy && { sortBy: filters.sortBy }),
+        ...(filters.sortOrder && { sortOrder: filters.sortOrder }),
       };
-      
-      console.log('Filters being sent to API:', params);
       
       const response = await api.get<UsersResponse>('/users', { params });
       return response.data;

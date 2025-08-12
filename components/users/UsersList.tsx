@@ -7,6 +7,7 @@ import { UserFilters, UserRole } from '@/lib/types/index';
 import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { Select } from '@/components/ui/Select';
 import { UserRoleSelect } from '@/components/users/UserRoleSelect';
 import { DeleteUserButton } from '@/components/users/DeleteUserButton';
 
@@ -31,6 +32,8 @@ export const UsersList: React.FC = () => {
   const [filters, setFilters] = useState<UserFilters>({
     page: 1,
     limit: 10,
+    sortBy: 'name', // Ordenar por nombre por defecto
+    sortOrder: 'asc', // Orden ascendente por defecto
   });
 
   // Estado local para el input de búsqueda (para UI responsiva)
@@ -125,7 +128,7 @@ export const UsersList: React.FC = () => {
     <div className="space-y-6">
       {/* Filtros */}
       <div className="bg-white p-4 rounded-lg shadow-sm border">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <Input
             placeholder="Buscar por nombre o email..."
             value={searchInput}
@@ -135,6 +138,22 @@ export const UsersList: React.FC = () => {
             value={filters.role || ''}
             onChange={(value) => handleFilterChange('role', value)}
             placeholder="Todos los roles"
+          />
+          <Select
+            options={[
+              { value: 'name', label: 'Ordenar por Nombre' },
+              { value: 'createdAt', label: 'Ordenar por Fecha' }
+            ]}
+            value={filters.sortBy || 'createdAt'}
+            onChange={(e) => handleFilterChange('sortBy', e.target.value)}
+          />
+          <Select
+            options={[
+              { value: 'asc', label: '↑ Ascendente' },
+              { value: 'desc', label: '↓ Descendente' }
+            ]}
+            value={filters.sortOrder || 'asc'}
+            onChange={(e) => handleFilterChange('sortOrder', e.target.value)}
           />
           <div className="flex justify-end">
             <Link href="/users/new">

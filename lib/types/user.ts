@@ -53,6 +53,8 @@ export interface UsersResponse {
 export interface UserFilters {
   role?: UserRole;
   search?: string; // búsqueda por nombre o email
+  sortBy?: string; // campo por el cual ordenar
+  sortOrder?: 'asc' | 'desc'; // dirección del orden
   // isActive no se incluye porque el servidor automáticamente filtra usuarios inactivos (soft delete)
   page?: number;
   limit?: number;
