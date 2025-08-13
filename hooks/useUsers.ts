@@ -138,18 +138,57 @@ export const useDeleteUser = () => {
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: async (data: ChangePasswordData): Promise<void> => {
-      await api.patch(`/users/${data.userId}/change-password`, {
-        newPassword: data.newPassword,
-        currentPassword: data.currentPassword,
-      });
+      // Determinar endpoint según si es cambio propio o administrativo
+      if (data.isOwnPassword) {
+        // Endpoint para cambio propio: /users/me/change-password
+        const payload = {
+          currentPassword: data.currentPassword,
+          newPassword: data.newPassword,
+        };
+        
+        const response = await api.patch('/users/me/change-password', payload);
+        return response.data;
+      } else {
+        // Endpoint administrativo: /users/{userId}/change-password
+        const payload = {
+          newPassword: data.newPassword,
+          ...(data.currentPassword && { currentPassword: data.currentPassword }),
+        };
+        
+        const response = await api.patch(`/users/${data.userId}/change-password`, payload);
+        return response.data;
+      }
     },
     onSuccess: () => {
       toast.success("Contraseña actualizada exitosamente");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message =
-        error.response?.data?.message || "Error al cambiar contraseña";
-      toast.error(message);
+      // Manejo específico de errores según la guía
+      const errorData = error.response?.data;
+      
+      if (error.response?.status === 400) {
+        if (errorData?.error === 'PasswordPolicyViolation') {
+          const policyErrors = errorData.details?.errors || [];
+          toast.error(`Error de política de contraseña: ${policyErrors.join(', ')}`);
+        } else if (errorData?.error === 'SamePassword') {
+          toast.error('La nueva contraseña debe ser diferente a la actual');
+        } else {
+          toast.error(errorData?.message || 'Datos de contraseña inválidos');
+        }
+      } else if (error.response?.status === 401) {
+        if (errorData?.error === 'InvalidCurrentPassword') {
+          toast.error('La contraseña actual es incorrecta');
+        } else {
+          toast.error('Error de autenticación');
+        }
+      } else if (error.response?.status === 403) {
+        toast.error('No tienes permisos para cambiar esta contraseña');
+      } else if (error.response?.status === 429) {
+        toast.error('Demasiados intentos. Espera unos minutos antes de intentar nuevamente');
+      } else {
+        const message = errorData?.message || "Error al cambiar contraseña";
+        toast.error(message);
+      }
     },
   });
 };

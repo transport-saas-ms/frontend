@@ -22,22 +22,10 @@ export const DashboardStats: React.FC = () => {
     page: 1 
   });
 
-  const { data: recentTripsData, isLoading: recentTripsLoading, error: recentTripsError } = useTripsWithExpenses({ 
+  const { data: recentTripsData, isLoading: recentTripsLoading } = useTripsWithExpenses({ 
     limit: 5,
     page: 1 
   });
-
-  // Log para debugging
-  React.useEffect(() => {
-    console.log('Dashboard data state:', {
-      tripsWithExpensesData,
-      expensesData,
-      recentTripsData,
-      tripsError,
-      expensesError,
-      recentTripsError
-    });
-  }, [tripsWithExpensesData, expensesData, recentTripsData, tripsError, expensesError, recentTripsError]);
 
   if (tripsLoading || expensesLoading) {
     return (

@@ -33,10 +33,8 @@ export const useExpenses = (filters: ExpenseFilters = {}) => {
       });
 
       const url = `/expenses?${params.toString()}`;
-      console.log('💰 Fetching expenses:', url);
       
       const response = await api.get(url);
-      console.log('💰 Expenses response:', response.data);
       
       return response.data;
     },

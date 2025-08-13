@@ -1,27 +1,27 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import { AxiosError } from 'axios';
-import api from '@/lib/api';
-import { useErrorHandler } from '@/hooks/useErrorHandler';
-import { 
-  Trip, 
-  CreateTripData, 
-  UpdateTripData, 
-  TripFilters, 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
+import { useErrorHandler } from "@/hooks/useErrorHandler";
+import {
+  Trip,
+  CreateTripData,
+  UpdateTripData,
+  TripFilters,
   TripsResponse,
-  TripsWithExpensesResponse, 
-  ApiError 
-} from '@/lib/types/index';
+  TripsWithExpensesResponse,
+  ApiError,
+} from "@/lib/types/index";
 
 // Keys para React Query
 export const tripKeys = {
-  all: ['trips'] as const,
-  lists: () => [...tripKeys.all, 'list'] as const,
+  all: ["trips"] as const,
+  lists: () => [...tripKeys.all, "list"] as const,
   list: (filters: TripFilters) => [...tripKeys.lists(), filters] as const,
-  details: () => [...tripKeys.all, 'detail'] as const,
+  details: () => [...tripKeys.all, "detail"] as const,
   detail: (id: string) => [...tripKeys.details(), id] as const,
-  withExpenses: (id: string) => [...tripKeys.detail(id), 'expenses'] as const,
+  withExpenses: (id: string) => [...tripKeys.detail(id), "expenses"] as const,
 };
 
 // Hook para obtener lista de viajes con filtros y paginación
@@ -30,7 +30,7 @@ export const useTrips = (filters: TripFilters = {}) => {
     queryKey: tripKeys.list(filters),
     queryFn: async (): Promise<TripsResponse> => {
       const params = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           params.append(key, value.toString());
@@ -38,11 +38,9 @@ export const useTrips = (filters: TripFilters = {}) => {
       });
 
       const url = `/trips?${params.toString()}`;
-      console.log('🚗 Fetching trips:', url);
-      
+
       const response = await api.get(url);
-      console.log('🚗 Trips response:', response.data);
-      
+
       return response.data;
     },
   });
@@ -51,10 +49,10 @@ export const useTrips = (filters: TripFilters = {}) => {
 // Hook para obtener viajes con gastos incluidos
 export const useTripsWithExpenses = (filters: TripFilters = {}) => {
   return useQuery({
-    queryKey: [...tripKeys.list(filters), 'with-expenses'],
+    queryKey: [...tripKeys.list(filters), "with-expenses"],
     queryFn: async (): Promise<TripsWithExpensesResponse> => {
       const params = new URLSearchParams();
-      
+
       Object.entries(filters).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           params.append(key, value.toString());
@@ -62,11 +60,9 @@ export const useTripsWithExpenses = (filters: TripFilters = {}) => {
       });
 
       const url = `/trips/with-expenses?${params.toString()}`;
-      console.log('🚗💰 Fetching trips with expenses:', url);
-      
+
       const response = await api.get(url);
-      console.log('🚗💰 Trips with expenses response:', response.data);
-      
+
       return response.data;
     },
   });
@@ -103,18 +99,18 @@ export const useCreateTrip = () => {
   const { handleError, is403Error } = useErrorHandler({
     show403Toast: true,
     customMessages: {
-      403: 'No tienes permisos para crear viajes. Contacta al administrador.',
+      403: "No tienes permisos para crear viajes. Contacta al administrador.",
     },
   });
 
   return useMutation({
     mutationFn: async (data: CreateTripData): Promise<Trip> => {
-      const response = await api.post('/trips', data);
+      const response = await api.post("/trips", data);
       return response.data;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-      toast.success('Viaje creado exitosamente');
+      toast.success("Viaje creado exitosamente");
       router.push(`/trips/${data.id}`);
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -123,7 +119,8 @@ export const useCreateTrip = () => {
         handleError(error);
       } else {
         // Para otros errores, usar el mensaje del servidor o uno genérico
-        const message = error.response?.data?.message || 'Error al crear el viaje';
+        const message =
+          error.response?.data?.message || "Error al crear el viaje";
         toast.error(message);
       }
     },
@@ -143,10 +140,11 @@ export const useUpdateTrip = (id: string) => {
       queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
       queryClient.invalidateQueries({ queryKey: tripKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: tripKeys.withExpenses(id) });
-      toast.success('Viaje actualizado exitosamente');
+      toast.success("Viaje actualizado exitosamente");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al actualizar el viaje';
+      const message =
+        error.response?.data?.message || "Error al actualizar el viaje";
       toast.error(message);
     },
   });
@@ -163,10 +161,11 @@ export const useDeleteTrip = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
-      router.push('/trips');
+      router.push("/trips");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al eliminar el viaje';
+      const message =
+        error.response?.data?.message || "Error al eliminar el viaje";
       toast.error(message);
     },
   });
@@ -184,11 +183,14 @@ export const useTripStatusActions = (tripId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
       queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
-      queryClient.invalidateQueries({ queryKey: tripKeys.withExpenses(tripId) });
-      toast.success('Viaje iniciado exitosamente');
+      queryClient.invalidateQueries({
+        queryKey: tripKeys.withExpenses(tripId),
+      });
+      toast.success("Viaje iniciado exitosamente");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al iniciar el viaje';
+      const message =
+        error.response?.data?.message || "Error al iniciar el viaje";
       toast.error(message);
     },
   });
@@ -201,11 +203,14 @@ export const useTripStatusActions = (tripId: string) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: tripKeys.lists() });
       queryClient.invalidateQueries({ queryKey: tripKeys.detail(tripId) });
-      queryClient.invalidateQueries({ queryKey: tripKeys.withExpenses(tripId) });
-      toast.success('Viaje completado exitosamente');
+      queryClient.invalidateQueries({
+        queryKey: tripKeys.withExpenses(tripId),
+      });
+      toast.success("Viaje completado exitosamente");
     },
     onError: (error: AxiosError<ApiError>) => {
-      const message = error.response?.data?.message || 'Error al completar el viaje';
+      const message =
+        error.response?.data?.message || "Error al completar el viaje";
       toast.error(message);
     },
   });

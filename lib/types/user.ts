@@ -29,9 +29,10 @@ export interface UpdateUserData {
 }
 
 export interface ChangePasswordData {
-  userId: string;
+  userId: string; // Siempre requerido
   newPassword: string;
-  currentPassword?: string; // Para validación adicional
+  currentPassword?: string; // Requerido para cambio propio
+  isOwnPassword?: boolean; // Para determinar qué endpoint usar
 }
 
 // Datos para soft delete (eliminación lógica)

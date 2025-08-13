@@ -111,8 +111,8 @@ export const UserForm: React.FC<UserFormProps> = ({
         await updateUser.mutateAsync(userData);
         router.push(`/users/${initialData?.id}`);
       }
-    } catch (error) {
-      console.error('Error submitting form:', error);
+    } catch {
+      // El error ya se maneja en el hook con React Query
     }
   };
 

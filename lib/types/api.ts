@@ -46,4 +46,8 @@ export interface ApiError {
   message: string;
   statusCode: number;
   error?: string;
+  details?: {
+    errors?: string[];
+    [key: string]: unknown;
+  };
 }

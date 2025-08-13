@@ -31,8 +31,13 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Si el token ha expirado (401), hacer logout completo
-    if (error.response?.status === 401) {
+    // Verificar si es un error 401 pero NO es por token expirado
+    const isPasswordError = error.response?.status === 401 && 
+                           (error.response?.data?.error === 'InvalidCurrentPassword' ||
+                            error.response?.data?.message?.includes('Current password is incorrect'));
+    
+    // Solo hacer logout si es 401 Y NO es error de contraseña
+    if (error.response?.status === 401 && !isPasswordError) {
       if (typeof window !== 'undefined') {
         // Limpiar localStorage
         localStorage.removeItem('auth-token');
@@ -50,15 +55,13 @@ api.interceptors.response.use(
           console.warn('Error clearing auth storage:', e);
         }
         
-        // Mostrar mensaje al usuario
-        console.warn('Sesión expirada. Redirigiendo al login...');
-        
         // Redirigir al login solo si no estamos ya allí
         if (!window.location.pathname.includes('/login')) {
           window.location.href = '/login?message=session-expired';
         }
       }
     }
+    
     return Promise.reject(error);
   }
 );

@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { DeleteUserButton } from '@/components/users/DeleteUserButton';
 import { ValidationErrors } from '@/components/ui/ValidationErrors';
+import { useAuthStore } from '@/store/auth';
 
 interface UserDetailProps {
   userId: string;
@@ -18,12 +19,60 @@ interface UserDetailProps {
 export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
   const { data: user, isLoading, error } = useUser(userId);
   const changePassword = useChangePassword();
+  const currentUser = useAuthStore((state) => state.user);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [passwordData, setPasswordData] = useState({
     newPassword: '',
     confirmPassword: '',
+    currentPassword: '', // Para cambio propio
   });
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+
+  // Determinar si el usuario está cambiando su propia contraseña
+  const isOwnPassword = currentUser?.id === userId;
+
+  // Validación de política de contraseña según la guía del backend
+  const validatePasswordPolicy = (password: string): string[] => {
+    const errors: string[] = [];
+    
+    if (password.length < 8) {
+      errors.push('Mínimo 8 caracteres');
+    }
+    
+    if (password.length > 128) {
+      errors.push('Máximo 128 caracteres');
+    }
+    
+    if (!/[a-z]/.test(password)) {
+      errors.push('Al menos una letra minúscula');
+    }
+    
+    if (!/[A-Z]/.test(password)) {
+      errors.push('Al menos una letra mayúscula');
+    }
+    
+    if (!/\d/.test(password)) {
+      errors.push('Al menos un número');
+    }
+    
+    if (!/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)) {
+      errors.push('Al menos un carácter especial');
+    }
+    
+    if (/\s/.test(password)) {
+      errors.push('No puede contener espacios');
+    }
+    
+    return errors;
+  };
+
+  const getPasswordStrength = (password: string): { strength: 'weak' | 'medium' | 'strong'; color: string } => {
+    const errors = validatePasswordPolicy(password);
+    
+    if (errors.length > 3) return { strength: 'weak', color: 'text-red-600' };
+    if (errors.length > 0) return { strength: 'medium', color: 'text-yellow-600' };
+    return { strength: 'strong', color: 'text-green-600' };
+  };
 
   const getRoleInfo = (role: UserRole) => {
     const roleConfig = {
@@ -60,10 +109,17 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
   const validatePassword = (): boolean => {
     const errors: string[] = [];
     
+    // Validar contraseña actual si es cambio propio
+    if (isOwnPassword && !passwordData.currentPassword) {
+      errors.push('La contraseña actual es obligatoria');
+    }
+    
     if (!passwordData.newPassword) {
       errors.push('La nueva contraseña es obligatoria');
-    } else if (passwordData.newPassword.length < 8) {
-      errors.push('La contraseña debe tener al menos 8 caracteres');
+    } else {
+      // Usar validación de política del backend
+      const policyErrors = validatePasswordPolicy(passwordData.newPassword);
+      errors.push(...policyErrors);
     }
     
     if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -79,20 +135,22 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
     
     try {
       await changePassword.mutateAsync({
-        userId: user.id,
+        userId: user.id, // Siempre incluir el userId
         newPassword: passwordData.newPassword,
+        currentPassword: isOwnPassword ? passwordData.currentPassword : undefined,
+        isOwnPassword: isOwnPassword,
       });
       setShowPasswordModal(false);
-      setPasswordData({ newPassword: '', confirmPassword: '' });
+      setPasswordData({ newPassword: '', confirmPassword: '', currentPassword: '' });
       setPasswordErrors([]);
-    } catch (error) {
-      console.error('Error changing password:', error);
+    } catch {
+      // El error ya se maneja en el hook con React Query
     }
   };
 
   const closePasswordModal = () => {
     setShowPasswordModal(false);
-    setPasswordData({ newPassword: '', confirmPassword: '' });
+    setPasswordData({ newPassword: '', confirmPassword: '', currentPassword: '' });
     setPasswordErrors([]);
   };
 
@@ -225,17 +283,60 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-gray-900">Cambiar contraseña</h3>
             <p className="text-sm text-gray-600">
-              Establece una nueva contraseña para <strong>{user?.name || 'el usuario'}</strong>
+              {isOwnPassword 
+                ? `Cambiar tu contraseña` 
+                : `Establece una nueva contraseña para ${user?.name || 'el usuario'}`
+              }
             </p>
+            
+            {/* Campo de contraseña actual solo para cambios propios */}
+            {isOwnPassword && (
+              <Input
+                label="Contraseña actual"
+                type="password"
+                value={passwordData.currentPassword}
+                onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                placeholder="Tu contraseña actual"
+                disabled={changePassword.isPending}
+              />
+            )}
             
             <Input
               label="Nueva contraseña"
               type="password"
               value={passwordData.newPassword}
               onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-              placeholder="Mínimo 8 caracteres"
+              placeholder="Mín. 8 caracteres, mayúscula, minúscula, número y símbolo"
               disabled={changePassword.isPending}
             />
+            
+            {/* Indicador de fuerza de contraseña */}
+            {passwordData.newPassword && (
+              <div className="space-y-2">
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm text-gray-600">Fuerza de contraseña:</span>
+                  <span className={`text-sm font-medium ${getPasswordStrength(passwordData.newPassword).color}`}>
+                    {getPasswordStrength(passwordData.newPassword).strength === 'weak' && '🔴 Débil'}
+                    {getPasswordStrength(passwordData.newPassword).strength === 'medium' && '🟡 Media'}
+                    {getPasswordStrength(passwordData.newPassword).strength === 'strong' && '🟢 Fuerte'}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 space-y-1">
+                  {validatePasswordPolicy(passwordData.newPassword).map((error, index) => (
+                    <div key={index} className="flex items-center space-x-1">
+                      <span className="text-red-500">✗</span>
+                      <span>{error}</span>
+                    </div>
+                  ))}
+                  {validatePasswordPolicy(passwordData.newPassword).length === 0 && (
+                    <div className="flex items-center space-x-1 text-green-600">
+                      <span>✓</span>
+                      <span>Cumple con todos los requisitos</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
             
             <Input
               label="Confirmar nueva contraseña"
@@ -255,7 +356,7 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
                 disabled={changePassword.isPending}
                 className="flex-1"
               >
-                Cambiar contraseña
+                {isOwnPassword ? 'Cambiar mi contraseña' : 'Cambiar contraseña'}
               </Button>
               <Button
                 variant="secondary"
