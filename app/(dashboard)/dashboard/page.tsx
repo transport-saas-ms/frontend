@@ -5,7 +5,6 @@ export default function DashboardPage() {
   return (
     <>
       <DashboardStats />
-      {/* {process.env.NODE_ENV === 'development' && <TokenTestComponent />} */}
     </>
   );
 }

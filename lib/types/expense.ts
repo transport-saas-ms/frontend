@@ -1,5 +1,5 @@
 import { ExpenseCategory, ExpenseStatus } from './common';
-import { User } from './auth';
+import { User } from './user';
 
 export interface ExpenseByCurrency {
   currency: string;
@@ -12,12 +12,12 @@ export interface Expense {
   description: string;
   amount: number | string; // Puede venir como string desde el backend
   currency?: string;
-  type?: string; // Nuevo campo del backend
-  category?: ExpenseCategory; // Para compatibilidad
+  type: ExpenseCategory; // Campo oficial
+  // category (deprecated) ya no se usa; se mantiene en migraciones anteriores
   date: string;
   imageUrl?: string;
   receiptNumber?: string;
-  receiptUrl?: string; // Para compatibilidad con versión anterior
+  receiptUrl?: string;
   status?: ExpenseStatus;
   tripId?: string;
   trip?: {
@@ -35,17 +35,21 @@ export interface Expense {
   updatedAt?: string;
 }
 
+// Nuevo contrato: el backend espera 'type' (enum) y además driverId & companyId.
+// Mantenemos 'category' para compatibilidad temporal en la UI, pero no se envía.
 export interface CreateExpenseData {
   description: string;
   amount: number;
-  category: ExpenseCategory;
-  date: string;
+  type: ExpenseCategory;
+  date: string; // ISO string
   tripId: string;
+  driverId: string;
+  companyId: string;
   receiptUrl?: string;
 }
 
 export interface ExpenseFilters {
-  category?: ExpenseCategory;
+  type?: ExpenseCategory;
   tripId?: string;
   userId?: string;
   startDate?: string;

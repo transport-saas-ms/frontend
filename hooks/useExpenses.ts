@@ -46,8 +46,10 @@ export const useExpense = (id: string) => {
   return useQuery({
     queryKey: expenseKeys.detail(id),
     queryFn: async (): Promise<Expense> => {
-      const response = await api.get(`/expenses/${id}`);
-      return response.data;
+  const response = await api.get(`/expenses/${id}`);
+  const data = response.data;
+  // El backend devuelve { expense, message, status } => normalizamos
+  return data?.expense ?? data;
     },
     enabled: !!id,
   });
@@ -59,14 +61,17 @@ export const useCreateExpense = () => {
 
   return useMutation({
     mutationFn: async (data: CreateExpenseData): Promise<Expense> => {
+      // Enviar payload según contrato backend (sin 'category')
       const response = await api.post('/expenses', data);
-      return response.data;
+  const resp = response.data;
+  return resp?.expense ?? resp;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
-      // También invalidar los datos del viaje relacionado
-      queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId] });
-      queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId, 'expenses'] });
+      if (data.tripId) {
+        queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId] });
+        queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId, 'expenses'] });
+      }
       toast.success('Gasto registrado exitosamente');
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -83,14 +88,16 @@ export const useUpdateExpense = (id: string) => {
   return useMutation({
     mutationFn: async (data: Partial<CreateExpenseData>): Promise<Expense> => {
       const response = await api.patch(`/expenses/${id}`, data);
-      return response.data;
+  const resp = response.data;
+  return resp?.expense ?? resp;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
       queryClient.invalidateQueries({ queryKey: expenseKeys.detail(id) });
-      // También invalidar los datos del viaje relacionado
-      queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId] });
-      queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId, 'expenses'] });
+      if (data.tripId) {
+        queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId] });
+        queryClient.invalidateQueries({ queryKey: ['trips', 'detail', data.tripId, 'expenses'] });
+      }
       toast.success('Gasto actualizado exitosamente');
     },
     onError: (error: AxiosError<ApiError>) => {
@@ -110,7 +117,6 @@ export const useDeleteExpense = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: expenseKeys.lists() });
-      toast.success('Gasto eliminado exitosamente');
     },
     onError: (error: AxiosError<ApiError>) => {
       const message = error.response?.data?.message || 'Error al eliminar el gasto';

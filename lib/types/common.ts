@@ -3,7 +3,7 @@ export type UserRole = 'ADMIN' | 'ACCOUNTANT' | 'DRIVER' | 'USER';
 
 export type TripStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
 
-export type ExpenseCategory = 'FUEL' | 'MAINTENANCE' | 'TOLLS' | 'FOOD' | 'ACCOMMODATION' | 'OTHER';
+export type ExpenseCategory = 'FUEL' | 'TOLL' | 'FOOD' | 'REPAIR' | 'OTHER';
 
 export type ExpenseStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 

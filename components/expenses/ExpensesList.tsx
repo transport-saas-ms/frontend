@@ -20,12 +20,12 @@ export const ExpensesList: React.FC = () => {
 
   const { data, isLoading, error } = useExpenses(filters);
 
-  const categoryOptions = [
-    { value: '', label: 'Todas las categorías' },
+  const typeOptions = [
+    { value: '', label: 'Todos los tipos' },
     { value: 'FUEL', label: 'Combustible' },
     { value: 'TOLL', label: 'Peajes' },
     { value: 'FOOD', label: 'Comida' },
-    { value: 'RAPAIR', label: 'Arreglos' },
+    { value: 'REPAIR', label: 'Reparación' },
     { value: 'OTHER', label: 'Otro' },
   ];
 
@@ -41,28 +41,26 @@ export const ExpensesList: React.FC = () => {
     setFilters(prev => ({ ...prev, page }));
   };
 
-  const getCategoryBadge = (category?: string) => {
-    if (!category) {
+  const getTypeBadge = (type?: string) => {
+    if (!type) {
       return (
         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
           Sin categoría
         </span>
       );
     }
-
-    const categoryConfig = {
+    const typeConfig = {
       FUEL: { color: 'bg-red-100 text-red-800', label: 'Combustible' },
-      MAINTENANCE: { color: 'bg-blue-100 text-blue-800', label: 'Mantenimiento' },
-      TOLLS: { color: 'bg-yellow-100 text-yellow-800', label: 'Peajes' },
+      TOLL: { color: 'bg-yellow-100 text-yellow-800', label: 'Peajes' },
       FOOD: { color: 'bg-green-100 text-green-800', label: 'Comida' },
-      ACCOMMODATION: { color: 'bg-purple-100 text-purple-800', label: 'Alojamiento' },
+      REPAIR: { color: 'bg-blue-100 text-blue-800', label: 'Reparación' },
       OTHER: { color: 'bg-gray-100 text-gray-800', label: 'Otro' },
     };
 
-    const config = categoryConfig[category as keyof typeof categoryConfig];
+    const config = typeConfig[type as keyof typeof typeConfig];
     return (
       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${config?.color || 'bg-gray-100 text-gray-800'}`}>
-        {config?.label || category}
+        {config?.label || type}
       </span>
     );
   };
@@ -104,10 +102,10 @@ export const ExpensesList: React.FC = () => {
       <div className="bg-white p-6 rounded-lg shadow">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
           <Select
-            label="Categoría"
-            options={categoryOptions}
-            value={filters.category || ''}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
+            label="Tipo"
+            options={typeOptions}
+            value={filters.type || ''}
+            onChange={(e) => handleFilterChange('type', e.target.value)}
           />
           <Input
             label="ID del Viaje"
@@ -150,7 +148,7 @@ export const ExpensesList: React.FC = () => {
                           {expense.description}
                         </p>
                         <div className="ml-2">
-                          {getCategoryBadge(expense.category)}
+                          {getTypeBadge(expense.type)}
                         </div>
                       </div>
                       <div className="mt-1">
@@ -192,6 +190,12 @@ export const ExpensesList: React.FC = () => {
                         </svg>
                       </a>
                     )}
+                    <Link 
+                      href={`/expenses/${expense.id}/edit`}
+                      className="text-gray-500 hover:text-gray-700 text-xs"
+                    >
+                      Editar
+                    </Link>
                     <DeleteExpenseButton 
                       expense={expense}
                       buttonSize="sm"

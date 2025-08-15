@@ -45,7 +45,7 @@ export const TripDetail: React.FC = () => {
     const categoryConfig = {
       FUEL: { color: 'bg-red-100 text-red-800', label: 'Combustible' },
       MAINTENANCE: { color: 'bg-blue-100 text-blue-800', label: 'Mantenimiento' },
-      TOLLS: { color: 'bg-yellow-100 text-yellow-800', label: 'Peajes' },
+      TOLL: { color: 'bg-yellow-100 text-yellow-800', label: 'Peajes' },
       FOOD: { color: 'bg-green-100 text-green-800', label: 'Comida' },
       ACCOMMODATION: { color: 'bg-purple-100 text-purple-800', label: 'Alojamiento' },
       OTHER: { color: 'bg-gray-100 text-gray-800', label: 'Otro' },
@@ -219,7 +219,7 @@ export const TripDetail: React.FC = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <div className="flex-shrink-0">
-                        {getCategoryBadge(expense.category)}
+                        {getCategoryBadge(expense.type)}
                       </div>
                       <div className="ml-4">
                         <p className="text-sm font-medium text-gray-900">

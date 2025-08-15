@@ -63,9 +63,6 @@ export const TripForm: React.FC<TripFormProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    console.log('🚗 Current user:', user);
-    console.log('🚗 User companyId:', user?.companyId);
-    
     // Validación básica
     if (!formData.title || !formData.origin || !formData.destination || !formData.scheduledDate || !formData.driverId) {
       alert('Por favor, complete todos los campos obligatorios');
