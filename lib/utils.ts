@@ -18,11 +18,11 @@ export const safeNumber = (value: unknown, defaultValue: number = 0): number => 
 };
 
 /**
- * Formatea un número como moneda
+ * Formatea un número como moneda usando formato español
  * @param value - El valor a formatear
  * @param currency - El símbolo de moneda (default: '$')
  * @param decimals - Número de decimales (default: 2)
- * @returns Cadena formateada como moneda
+ * @returns Cadena formateada como moneda (ej: $350.000,00)
  */
 export const formatCurrency = (
   value: number | string, 
@@ -30,7 +30,14 @@ export const formatCurrency = (
   decimals: number = 2
 ): string => {
   const num = safeNumber(value);
-  return `${currency}${num.toFixed(decimals)}`;
+  
+  // Usar el formato español (es-ES) para separadores
+  const formatted = num.toLocaleString('es-ES', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+  
+  return `${currency}${formatted}`;
 };
 
 /**
@@ -56,11 +63,11 @@ export const getCurrencySymbol = (currencyCode?: string): string => {
 };
 
 /**
- * Formatea moneda con el símbolo correcto según el código
+ * Formatea moneda con el símbolo correcto según el código usando formato español
  * @param value - El valor a formatear
  * @param currencyCode - Código de moneda (USD, ARS, etc.)
  * @param decimals - Número de decimales (default: 2)
- * @returns Cadena formateada con moneda apropiada
+ * @returns Cadena formateada con moneda apropiada (ej: $350.000,00 ARS)
  */
 export const formatCurrencyWithCode = (
   value: number | string, 
@@ -69,8 +76,15 @@ export const formatCurrencyWithCode = (
 ): string => {
   const symbol = getCurrencySymbol(currencyCode);
   const num = safeNumber(value);
+  
+  // Usar el formato español (es-ES) para separadores
+  const formatted = num.toLocaleString('es-ES', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+  
   const suffix = currencyCode && currencyCode !== 'USD' ? ` ${currencyCode}` : '';
-  return `${symbol}${num.toFixed(decimals)}${suffix}`;
+  return `${symbol}${formatted}${suffix}`;
 };
 
 /**
