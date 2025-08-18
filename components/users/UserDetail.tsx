@@ -184,55 +184,85 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
   const roleInfo = getRoleInfo(user.role);
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header con acciones */}
-      <div className="bg-white shadow-sm rounded-lg p-6">
-        <div className="flex justify-between items-start">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">{user.name}</h1>
-            <p className="text-gray-500 mt-1">{user.email}</p>
-          </div>
-          <div className="flex space-x-3">
-            <Link href={`/users/${user.id}/edit`}>
-              <Button variant="secondary">
-                ✏️ Editar
-              </Button>
-            </Link>
-            <Button 
-              variant="secondary" 
-              onClick={() => setShowPasswordModal(true)}
-            >
-              🔒 Cambiar contraseña
+    <div className="space-y-4 md:space-y-6">
+      {/* Header Mobile First */}
+      <div className="space-y-4">
+        {/* Back button y título */}
+        <div className="flex items-center space-x-3">
+          <Link href="/users">
+            <Button variant="ghost" size="sm" className="p-2">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
             </Button>
+          </Link>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-bold text-gray-900 truncate md:text-2xl">
+              {user.name}
+            </h1>
+            <p className="text-sm text-gray-500 truncate md:text-base">
+              {user.email}
+            </p>
+          </div>
+        </div>
+
+        {/* Role badge prominente en móvil */}
+        <div className="flex justify-center md:hidden">
+          <span className={`inline-flex items-center px-4 py-2 rounded-full text-sm font-medium border ${roleInfo.color}`}>
+            {roleInfo.label}
+          </span>
+        </div>
+
+        {/* Botones de acción */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:gap-3 md:justify-center">
+          <Link href={`/users/${user.id}/edit`} className="flex-1 sm:flex-none">
+            <Button variant="secondary" className="w-full sm:w-auto">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Editar
+            </Button>
+          </Link>
+          <Button 
+            variant="secondary" 
+            onClick={() => setShowPasswordModal(true)}
+            className="w-full sm:w-auto"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Cambiar contraseña
+          </Button>
+          <div className="flex-1 sm:flex-none">
             <DeleteUserButton 
               user={user}
-              buttonText="Eliminar usuario"
+              buttonText="Eliminar"
             />
           </div>
         </div>
       </div>
 
-      {/* Información del usuario */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Información del usuario - Mobile First */}
+      <div className="space-y-4 md:grid md:grid-cols-2 md:gap-6 md:space-y-0">
         {/* Información básica */}
-        <div className="bg-white shadow-sm rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Información básica</h2>
-          <dl className="space-y-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Nombre completo</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user.name}</dd>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 md:shadow-sm md:p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Información básica</h2>
+          <div className="space-y-4">
+            <div className="bg-gray-50 rounded-lg p-3 md:bg-transparent md:p-0">
+              <div className="text-sm font-medium text-gray-500 mb-1">Nombre completo</div>
+              <div className="text-base text-gray-900 font-medium md:font-normal">{user.name}</div>
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Email</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user.email}</dd>
+            <div className="bg-white rounded-lg p-3 border border-gray-200 md:border-0 md:bg-transparent md:p-0">
+              <div className="text-sm font-medium text-gray-500 mb-1">Email</div>
+              <div className="text-base text-gray-900 font-medium md:font-normal break-all">{user.email}</div>
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Compañía</dt>
-              <dd className="mt-1 text-sm text-gray-900">{user.company?.name || 'No disponible'}</dd>
+            <div className="bg-gray-50 rounded-lg p-3 md:bg-transparent md:p-0">
+              <div className="text-sm font-medium text-gray-500 mb-1">Compañía</div>
+              <div className="text-base text-gray-900 font-medium md:font-normal">{user.company?.name || 'No disponible'}</div>
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Fecha de registro</dt>
-              <dd className="mt-1 text-sm text-gray-900">
+            <div className="bg-white rounded-lg p-3 border border-gray-200 md:border-0 md:bg-transparent md:p-0">
+              <div className="text-sm font-medium text-gray-500 mb-1">Fecha de registro</div>
+              <div className="text-base text-gray-900 font-medium md:font-normal">
                 {user.createdAt 
                   ? new Date(user.createdAt).toLocaleDateString('es-ES', {
                       year: 'numeric',
@@ -241,130 +271,161 @@ export const UserDetail: React.FC<UserDetailProps> = ({ userId }) => {
                     })
                   : 'No disponible'
                 }
-              </dd>
+              </div>
             </div>
-          </dl>
+          </div>
         </div>
 
         {/* Rol y permisos */}
-        <div className="bg-white shadow-sm rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-4">Rol y permisos</h2>
+        <div className="bg-white rounded-lg border border-gray-200 p-4 md:shadow-sm md:p-6">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Rol y permisos</h2>
           <div className="space-y-4">
-            <div>
-              <dt className="text-sm font-medium text-gray-500 mb-2">Rol actual</dt>
-              <dd>
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${roleInfo.color}`}>
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <div className="text-sm font-medium text-gray-500 mb-2">Rol actual</div>
+              <div className="flex items-center justify-between">
+                <span className={`inline-flex items-center px-3 py-2 rounded-full text-sm font-medium border ${roleInfo.color}`}>
                   {roleInfo.label}
                 </span>
-              </dd>
+                <div className="hidden md:block">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    ✓ Activo
+                  </span>
+                </div>
+              </div>
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Descripción</dt>
-              <dd className="mt-1 text-sm text-gray-600">{roleInfo.description}</dd>
+            <div className="bg-white rounded-lg p-3 border border-gray-200 md:border-0 md:bg-transparent md:p-0">
+              <div className="text-sm font-medium text-gray-500 mb-1">Descripción</div>
+              <div className="text-sm text-gray-600">{roleInfo.description}</div>
             </div>
-            <div>
-              <dt className="text-sm font-medium text-gray-500">Estado</dt>
-              <dd className="mt-1">
+            <div className="bg-gray-50 rounded-lg p-3 md:hidden">
+              <div className="text-sm font-medium text-gray-500 mb-1">Estado</div>
+              <div>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   ✓ Activo
                 </span>
-              </dd>
+              </div>
+            </div>
+            <div className="hidden md:block">
+              <div className="text-sm font-medium text-gray-500">Estado</div>
+              <div className="mt-1">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  ✓ Activo
+                </span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Modal para cambiar contraseña */}
+      {/* Modal para cambiar contraseña - Mobile First */}
       <Modal 
         isOpen={showPasswordModal} 
         onClose={closePasswordModal}
       >
-        <div className="p-6">
-          <div className="space-y-4">
-            <h3 className="text-lg font-medium text-gray-900">Cambiar contraseña</h3>
-            <p className="text-sm text-gray-600">
-              {isOwnPassword 
-                ? `Cambiar tu contraseña` 
-                : `Establece una nueva contraseña para ${user?.name || 'el usuario'}`
-              }
-            </p>
+        <div className="p-4 md:p-6">
+          <div className="space-y-4 md:space-y-6">
+            <div className="text-center md:text-left">
+              <h3 className="text-lg font-semibold text-gray-900 md:text-xl">Cambiar contraseña</h3>
+              <p className="text-sm text-gray-600 mt-2">
+                {isOwnPassword 
+                  ? `Cambiar tu contraseña` 
+                  : `Establece una nueva contraseña para ${user?.name || 'el usuario'}`
+                }
+              </p>
+            </div>
             
             {/* Campo de contraseña actual solo para cambios propios */}
             {isOwnPassword && (
-              <Input
-                label="Contraseña actual"
-                type="password"
-                value={passwordData.currentPassword}
-                onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
-                placeholder="Tu contraseña actual"
-                disabled={changePassword.isPending}
-              />
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                <Input
+                  label="Contraseña actual"
+                  type="password"
+                  value={passwordData.currentPassword}
+                  onChange={(e) => setPasswordData(prev => ({ ...prev, currentPassword: e.target.value }))}
+                  placeholder="Tu contraseña actual"
+                  disabled={changePassword.isPending}
+                />
+              </div>
             )}
             
-            <Input
-              label="Nueva contraseña"
-              type="password"
-              value={passwordData.newPassword}
-              onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
-              placeholder="Mín. 8 caracteres, mayúscula, minúscula, número y símbolo"
-              disabled={changePassword.isPending}
-            />
+            <div>
+              <Input
+                label="Nueva contraseña"
+                type="password"
+                value={passwordData.newPassword}
+                onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                placeholder="Mín. 8 caracteres con mayúscula, número y símbolo"
+                disabled={changePassword.isPending}
+              />
+            </div>
             
-            {/* Indicador de fuerza de contraseña */}
+            {/* Indicador de fuerza de contraseña - Mobile optimized */}
             {passwordData.newPassword && (
-              <div className="space-y-2">
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">Fuerza de contraseña:</span>
-                  <span className={`text-sm font-medium ${getPasswordStrength(passwordData.newPassword).color}`}>
+              <div className="bg-gray-50 rounded-lg p-3 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-gray-700">Fuerza de contraseña:</span>
+                  <span className={`text-sm font-bold ${getPasswordStrength(passwordData.newPassword).color}`}>
                     {getPasswordStrength(passwordData.newPassword).strength === 'weak' && '🔴 Débil'}
                     {getPasswordStrength(passwordData.newPassword).strength === 'medium' && '🟡 Media'}
                     {getPasswordStrength(passwordData.newPassword).strength === 'strong' && '🟢 Fuerte'}
                   </span>
                 </div>
-                <div className="text-xs text-gray-500 space-y-1">
-                  {validatePasswordPolicy(passwordData.newPassword).map((error, index) => (
-                    <div key={index} className="flex items-center space-x-1">
-                      <span className="text-red-500">✗</span>
-                      <span>{error}</span>
+                
+                {/* Requisitos de contraseña */}
+                <div className="space-y-1">
+                  {validatePasswordPolicy(passwordData.newPassword).length > 0 ? (
+                    <div className="text-xs space-y-1">
+                      <div className="font-medium text-gray-700 mb-2">Requisitos pendientes:</div>
+                      {validatePasswordPolicy(passwordData.newPassword).map((error, index) => (
+                        <div key={index} className="flex items-center space-x-2">
+                          <span className="text-red-500 text-xs">✗</span>
+                          <span className="text-red-600">{error}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                  {validatePasswordPolicy(passwordData.newPassword).length === 0 && (
-                    <div className="flex items-center space-x-1 text-green-600">
-                      <span>✓</span>
-                      <span>Cumple con todos los requisitos</span>
+                  ) : (
+                    <div className="flex items-center space-x-2 text-green-600">
+                      <span className="text-sm">✓</span>
+                      <span className="text-sm font-medium">Cumple con todos los requisitos</span>
                     </div>
                   )}
                 </div>
               </div>
             )}
             
-            <Input
-              label="Confirmar nueva contraseña"
-              type="password"
-              value={passwordData.confirmPassword}
-              onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-              placeholder="Repite la nueva contraseña"
-              disabled={changePassword.isPending}
-            />
+            <div>
+              <Input
+                label="Confirmar nueva contraseña"
+                type="password"
+                value={passwordData.confirmPassword}
+                onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                placeholder="Repite la nueva contraseña"
+                disabled={changePassword.isPending}
+              />
+            </div>
             
             <ValidationErrors errors={passwordErrors} />
             
-            <div className="flex space-x-3 pt-4">
-              <Button
-                onClick={handleChangePassword}
-                loading={changePassword.isPending}
-                disabled={changePassword.isPending}
-                className="flex-1"
-              >
-                {isOwnPassword ? 'Cambiar mi contraseña' : 'Cambiar contraseña'}
-              </Button>
-              <Button
-                variant="secondary"
-                onClick={closePasswordModal}
-                disabled={changePassword.isPending}
-              >
-                Cancelar
-              </Button>
+            {/* Botones de acción - Mobile First */}
+            <div className="pt-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
+                <Button
+                  onClick={handleChangePassword}
+                  loading={changePassword.isPending}
+                  disabled={changePassword.isPending}
+                  className="w-full sm:flex-1 order-2 sm:order-1"
+                >
+                  {isOwnPassword ? 'Cambiar mi contraseña' : 'Cambiar contraseña'}
+                </Button>
+                <Button
+                  variant="secondary"
+                  onClick={closePasswordModal}
+                  disabled={changePassword.isPending}
+                  className="w-full sm:w-auto order-1 sm:order-2"
+                >
+                  Cancelar
+                </Button>
+              </div>
             </div>
           </div>
         </div>

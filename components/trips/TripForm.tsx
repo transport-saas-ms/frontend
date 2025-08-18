@@ -132,7 +132,7 @@ export const TripForm: React.FC<TripFormProps> = ({
         </div>
         <div className="mt-4 flex space-x-3 md:mt-0 md:ml-4">
           <Button 
-            variant="ghost" 
+            variant="secondary" 
             onClick={() => router.back()}
           >
             Cancelar
@@ -214,7 +214,7 @@ export const TripForm: React.FC<TripFormProps> = ({
           <div className="flex justify-end space-x-3">
             <Button
               type="button"
-              variant="ghost"
+              variant="secondary"
               onClick={() => router.back()}
             >
               Cancelar

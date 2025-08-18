@@ -161,7 +161,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
           </p>
         </div>
         <div className="mt-4 flex space-x-3 md:mt-0 md:ml-4">
-          <Button variant="ghost" onClick={() => router.back()}>
+          <Button variant="secondary" onClick={() => router.back()}>
             Cancelar
           </Button>
         </div>
@@ -231,7 +231,7 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
           </div>
 
           <div className="flex justify-end space-x-3">
-            <Button type="button" variant="ghost" onClick={() => router.back()}>
+            <Button type="button" variant="secondary" onClick={() => router.back()}>
               Cancelar
             </Button>
             <Button type="submit" loading={submitting}>
