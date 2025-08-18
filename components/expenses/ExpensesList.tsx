@@ -59,6 +59,29 @@ export const ExpensesList: React.FC = () => {
     return hasCapability(CAPABILITIES.MANAGE_EXPENSES);
   }, [hasCapability]);
 
+  // Verificar si puede editar sus propios gastos (para drivers)
+  const canEditOwnExpenses = useMemo(() => {
+    return hasCapability(CAPABILITIES.UPDATE_OWN_EXPENSES);
+  }, [hasCapability]);
+
+  // Función para determinar si puede editar un gasto específico
+  const canEditExpense = (expense: Expense): boolean => {
+    // Admins/Accountants pueden editar todos los gastos
+    if (canManageExpenses) return true;
+    
+    // Drivers pueden editar solo sus propios gastos
+    if (canEditOwnExpenses && user && expense.driverId === user.id) return true;
+    
+    return false;
+  };
+
+  // Función para determinar si puede eliminar un gasto específico
+  const canDeleteExpense = (): boolean => {
+    // Solo admins/accountants pueden eliminar gastos
+    // Los drivers no pueden eliminar, solo editar
+    return canManageExpenses;
+  };
+
   const typeOptions = [
     { value: "", label: "Todos los tipos" },
     { value: "FUEL", label: "Combustible" },
@@ -326,7 +349,7 @@ export const ExpensesList: React.FC = () => {
                       )}
                     </div>
                     <div className="flex items-center space-x-2">
-                      {canManageExpenses && (
+                      {canEditExpense(expense) && (
                         <Link
                           href={`/expenses/${expense.id}/edit`}
                           className="text-gray-500 hover:text-gray-700 text-sm"
@@ -349,7 +372,7 @@ export const ExpensesList: React.FC = () => {
                           </Button>
                         </Link>
                       )}
-                      {canManageExpenses && (
+                      {canDeleteExpense() && (
                         <DeleteExpenseButton
                           expense={expense}
                           buttonSize="sm"
@@ -425,7 +448,7 @@ export const ExpensesList: React.FC = () => {
                         </svg>
                       </a>
                     )}
-                    {canManageExpenses && (
+                    {canEditExpense(expense) && (
                       <Link
                         href={`/expenses/${expense.id}/edit`}
                         className="text-gray-500 hover:text-gray-700 text-xs"
@@ -433,7 +456,7 @@ export const ExpensesList: React.FC = () => {
                         Editar
                       </Link>
                     )}
-                    {canManageExpenses && (
+                    {canDeleteExpense() && (
                       <DeleteExpenseButton
                         expense={expense}
                         buttonSize="sm"
