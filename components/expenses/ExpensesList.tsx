@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useExpenses } from '@/hooks/useExpenses';
-import { ExpenseFilters } from '@/lib/types/index';
+import { ExpenseFilters, Expense } from '@/lib/types/index';
 import { formatCurrency, formatDate, safeNumber } from '@/lib/utils';
 import { formatExpensesTotal } from '@/lib/expenseUtils';
 import { LoadingSpinner, EmptyState } from '@/components/ui/LoadingSpinner';
@@ -11,6 +11,9 @@ import { Button } from '@/components/ui/Button';
 import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { DeleteExpenseButton } from '@/components/expenses/DeleteExpenseButton';
+import { useAuthStore } from '@/store/auth';
+import { usePermissions } from '@/hooks/useAuthMe';
+import { CAPABILITIES } from '@/lib/permissions';
 
 export const ExpensesList: React.FC = () => {
   const [filters, setFilters] = useState<ExpenseFilters>({
@@ -18,7 +21,37 @@ export const ExpensesList: React.FC = () => {
     limit: 10,
   });
 
+  const { user } = useAuthStore();
+  const { hasCapability, isDriver } = usePermissions();
   const { data, isLoading, error } = useExpenses(filters);
+
+  // Determinar si el usuario es un chofer y debe ver solo sus gastos
+  const isDriverUser = useMemo(() => {
+    return isDriver && hasCapability(CAPABILITIES.VIEW_OWN_EXPENSES);
+  }, [isDriver, hasCapability]);
+
+  // Filtrar gastos según el rol del usuario
+  const filteredExpenses = useMemo(() => {
+    if (!data?.expenses) return [];
+    
+    // Si es un chofer, solo mostrar sus gastos
+    if (isDriverUser && user) {
+      return data.expenses.filter((expense: Expense) => expense.driverId === user.id);
+    }
+    
+    // Para otros roles, mostrar todos los gastos
+    return data.expenses;
+  }, [data?.expenses, isDriverUser, user]);
+
+  // Verificar si puede crear nuevos gastos
+  const canCreateExpense = useMemo(() => {
+    return hasCapability(CAPABILITIES.CREATE_EXPENSE) || hasCapability(CAPABILITIES.MANAGE_EXPENSES);
+  }, [hasCapability]);
+
+  // Verificar si puede gestionar gastos (editar/eliminar)
+  const canManageExpenses = useMemo(() => {
+    return hasCapability(CAPABILITIES.MANAGE_EXPENSES);
+  }, [hasCapability]);
 
   const typeOptions = [
     { value: '', label: 'Todos los tipos' },
@@ -92,9 +125,11 @@ export const ExpensesList: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <Link href="/expenses/new">
-            <Button>Nuevo Gasto</Button>
-          </Link>
+          {canCreateExpense && (
+            <Link href="/expenses/new">
+              <Button>Nuevo Gasto</Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -130,10 +165,10 @@ export const ExpensesList: React.FC = () => {
       </div>
 
       {/* Lista de gastos */}
-      {data && data.expenses?.length > 0 ? (
+      {filteredExpenses && filteredExpenses.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
-            {data.expenses.map((expense) => (
+            {filteredExpenses.map((expense) => (
               <li key={expense.id} className="px-4 py-4 sm:px-6">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center min-w-0 flex-1">
@@ -190,18 +225,22 @@ export const ExpensesList: React.FC = () => {
                         </svg>
                       </a>
                     )}
-                    <Link 
-                      href={`/expenses/${expense.id}/edit`}
-                      className="text-gray-500 hover:text-gray-700 text-xs"
-                    >
-                      Editar
-                    </Link>
-                    <DeleteExpenseButton 
-                      expense={expense}
-                      buttonSize="sm"
-                      buttonVariant="ghost"
-                      showIcon={true}
-                    />
+                    {canManageExpenses && (
+                      <Link 
+                        href={`/expenses/${expense.id}/edit`}
+                        className="text-gray-500 hover:text-gray-700 text-xs"
+                      >
+                        Editar
+                      </Link>
+                    )}
+                    {canManageExpenses && (
+                      <DeleteExpenseButton 
+                        expense={expense}
+                        buttonSize="sm"
+                        buttonVariant="ghost"
+                        showIcon={true}
+                      />
+                    )}
                   </div>
                 </div>
               </li>
@@ -209,7 +248,7 @@ export const ExpensesList: React.FC = () => {
           </ul>
 
           {/* Paginación */}
-          {data.totalPages > 1 && (
+          {data && data.totalPages && data.totalPages > 1 && (
             <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="flex-1 flex justify-between sm:hidden">
                 <Button
@@ -271,7 +310,7 @@ export const ExpensesList: React.FC = () => {
                 Total de gastos mostrados:
               </p>
               <p className="text-lg font-semibold text-gray-900">
-                {data.expenses ? formatExpensesTotal(data.expenses, true) : '$0.00'}
+                {filteredExpenses ? formatExpensesTotal(filteredExpenses, true) : '$0.00'}
               </p>
             </div>
           </div>
@@ -279,11 +318,13 @@ export const ExpensesList: React.FC = () => {
       ) : (
         <EmptyState
           title="No hay gastos"
-          description="Comienza registrando tu primer gasto."
+          description={isDriverUser ? "No tienes gastos registrados." : "Comienza registrando tu primer gasto."}
           action={
-            <Link href="/expenses/new">
-              <Button>Registrar Gasto</Button>
-            </Link>
+            canCreateExpense ? (
+              <Link href="/expenses/new">
+                <Button>Registrar Gasto</Button>
+              </Link>
+            ) : undefined
           }
           icon={
             <svg

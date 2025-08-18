@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useTripsWithExpenses } from '@/hooks/useTrips';
 import { TripFilters, Trip } from '@/lib/types/index';
@@ -10,6 +10,9 @@ import { Select } from '@/components/ui/Select';
 import { Input } from '@/components/ui/Input';
 import { TripStatusSelect } from '@/components/trips/TripStatusSelect';
 import { formatExpensesTotal } from '@/lib/expenseUtils';
+import { useAuthStore } from '@/store/auth';
+import { usePermissions } from '@/hooks/useAuthMe';
+import { CAPABILITIES } from '@/lib/permissions';
 
 export const TripsList: React.FC = () => {
   const [filters, setFilters] = useState<TripFilters>({
@@ -17,7 +20,32 @@ export const TripsList: React.FC = () => {
     limit: 10,
   });
 
+  const { user } = useAuthStore();
+  const { hasCapability, isDriver } = usePermissions();
   const { data, isLoading, error } = useTripsWithExpenses(filters);
+
+  // Determinar si el usuario es un chofer y debe ver solo sus viajes
+  const isDriverUser = useMemo(() => {
+    return isDriver && hasCapability(CAPABILITIES.VIEW_OWN_TRIPS);
+  }, [isDriver, hasCapability]);
+
+  // Filtrar viajes según el rol del usuario
+  const filteredTrips = useMemo(() => {
+    if (!data?.trips) return [];
+    
+    // Si es un chofer, solo mostrar sus viajes asignados
+    if (isDriverUser && user) {
+      return data.trips.filter((trip: Trip) => trip.driverId === user.id);
+    }
+    
+    // Para otros roles, mostrar todos los viajes
+    return data.trips;
+  }, [data?.trips, isDriverUser, user]);
+
+  // Verificar si puede crear nuevos viajes
+  const canCreateTrip = useMemo(() => {
+    return hasCapability(CAPABILITIES.CREATE_TRIP);
+  }, [hasCapability]);
 
   const statusOptions = [
     { value: '', label: 'Todos los estados' },
@@ -80,9 +108,11 @@ export const TripsList: React.FC = () => {
           </p>
         </div>
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-          <Link href="/trips/new">
-            <Button>Nuevo Viaje</Button>
-          </Link>
+          {canCreateTrip && (
+            <Link href="/trips/new">
+              <Button>Nuevo Viaje</Button>
+            </Link>
+          )}
         </div>
       </div>
 
@@ -111,10 +141,10 @@ export const TripsList: React.FC = () => {
       </div>
 
       {/* Lista de viajes */}
-      {data && data.trips?.length > 0 ? (
+      {filteredTrips && filteredTrips.length > 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-md">
           <ul className="divide-y divide-gray-200">
-            {data.trips.map((trip: Trip) => (
+            {filteredTrips.map((trip: Trip) => (
               <li key={trip.id} className="bg-white">
                 <div className="px-4 py-4 flex items-center justify-between">
                   <div className="min-w-0 flex-1">
@@ -176,7 +206,7 @@ export const TripsList: React.FC = () => {
           </ul>
 
           {/* Paginación */}
-          {data.totalPages && data.totalPages > 1 && (
+          {data && data.totalPages && data.totalPages > 1 && (
             <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
               <div className="flex-1 flex justify-between sm:hidden">
                 <Button
@@ -234,11 +264,13 @@ export const TripsList: React.FC = () => {
       ) : (
         <EmptyState
           title="No hay viajes"
-          description="Comienza creando tu primer viaje."
+          description={isDriverUser ? "No tienes viajes asignados." : "Comienza creando tu primer viaje."}
           action={
-            <Link href="/trips/new">
-              <Button>Crear Viaje</Button>
-            </Link>
+            canCreateTrip ? (
+              <Link href="/trips/new">
+                <Button>Crear Viaje</Button>
+              </Link>
+            ) : undefined
           }
           icon={
             <svg

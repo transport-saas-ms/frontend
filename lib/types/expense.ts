@@ -20,6 +20,15 @@ export interface Expense {
   receiptUrl?: string;
   status?: ExpenseStatus;
   tripId?: string;
+  driverId?: string; // ID del chofer que creó el gasto
+  companyId?: string; // ID de la compañía
+  approvedAt?: string;
+  approvedBy?: string;
+  rejectionReason?: string;
+  deleteReason?: string;
+  deletedAt?: string;
+  deletedBy?: string;
+  isActive?: boolean;
   trip?: {
     id: string;
     title: string;

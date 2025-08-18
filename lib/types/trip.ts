@@ -1,6 +1,5 @@
 import { TripStatus, BaseEntity } from './common';
 import { User } from './auth';
-import { Vehicle } from './vehicle';
 import { Expense, ExpenseByCurrency } from './expense';
 
 export interface Trip extends BaseEntity {
@@ -19,8 +18,6 @@ export interface Trip extends BaseEntity {
   companyId: string;
   createdBy: string;
   driver?: User;
-  vehicleId?: string;
-  vehicle?: Vehicle;
   expenses?: Expense[];
   expensesByCurrency?: ExpenseByCurrency[];
   totalExpensesCount?: number;

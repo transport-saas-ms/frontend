@@ -1,6 +1,9 @@
 import { UserRole } from './common';
 import { User, UserPermissions } from './user';
 
+// Re-exportar User para compatibilidad
+export type { User, UserPermissions } from './user';
+
 export interface AuthMeResponse {
   user: User;
   permissions: UserPermissions;

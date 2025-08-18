@@ -101,7 +101,7 @@ export const getExpensesStats = (expenses: Expense[]) => {
   
   // Agrupar por categoría
   const categoryBreakdown = expenses.reduce((acc, expense) => {
-    const category = expense.category || 'OTHER';
+    const category = expense.type || 'OTHER';
     const amount = safeNumber(expense.amount);
     
     if (!acc[category]) {
