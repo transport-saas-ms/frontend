@@ -3,6 +3,8 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { useExpenses } from "@/hooks/useExpenses";
+import { useTrips } from "@/hooks/useTrips";
+import { useUsers } from "@/hooks/useUsers";
 import { ExpenseFilters, Expense } from "@/lib/types/index";
 import { formatCurrency, formatDate, safeNumber } from "@/lib/utils";
 import { formatExpensesTotal } from "@/lib/expenseUtils";
@@ -25,6 +27,10 @@ export const ExpensesList: React.FC = () => {
   const { user } = useAuthStore();
   const { hasCapability, isDriver } = usePermissions();
   const { data, isLoading, error } = useExpenses(filters);
+
+  // Obtener datos para los filtros
+  const { data: tripsData } = useTrips({ page: 1, limit: 100 }); // Obtener más viajes para el filtro
+  const { data: usersData } = useUsers({ page: 1, limit: 100 }); // Obtener usuarios para el filtro
 
   // Determinar si el usuario es un chofer y debe ver solo sus gastos
   const isDriverUser = useMemo(() => {
@@ -91,6 +97,34 @@ export const ExpensesList: React.FC = () => {
     { value: "OTHER", label: "Otro" },
   ];
 
+  // Opciones para el filtro de viajes
+  const tripOptions = useMemo(() => {
+    const options = [{ value: "", label: "Todos los viajes" }];
+    if (tripsData?.trips) {
+      const tripOptionsFromData = tripsData.trips.map((trip) => ({
+        value: trip.id.toString(),
+        label: trip.title,
+      }));
+      options.push(...tripOptionsFromData);
+    }
+    return options;
+  }, [tripsData]);
+
+  // Opciones para el filtro de choferes
+  const driverOptions = useMemo(() => {
+    const options = [{ value: "", label: "Todos los choferes" }];
+    if (usersData?.users) {
+      // Filtrar solo usuarios con rol DRIVER
+      const drivers = usersData.users.filter((user) => user.role === "DRIVER");
+      const driverOptionsFromData = drivers.map((driver) => ({
+        value: driver.id.toString(),
+        label: driver.name,
+      }));
+      options.push(...driverOptionsFromData);
+    }
+    return options;
+  }, [usersData]);
+
   const handleFilterChange = (
     key: keyof ExpenseFilters,
     value: string | number
@@ -118,10 +152,11 @@ export const ExpensesList: React.FC = () => {
     let count = 0;
     if (filters.type) count++;
     if (filters.tripId) count++;
+    if (filters.driverId) count++;
     if (filters.startDate) count++;
     if (filters.endDate) count++;
     return count;
-  }, [filters.type, filters.tripId, filters.startDate, filters.endDate]);
+  }, [filters.type, filters.tripId, filters.driverId, filters.startDate, filters.endDate]);
 
   const getTypeBadge = (type?: string) => {
     if (!type) {
@@ -233,19 +268,24 @@ export const ExpensesList: React.FC = () => {
               </Button>
             )}
           </div>
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-5">
             <Select
               label="Tipo"
               options={typeOptions}
               value={filters.type || ""}
               onChange={(e) => handleFilterChange("type", e.target.value)}
             />
-            <Input
-              label="ID del Viaje"
-              type="text"
-              placeholder="Filtrar por viaje"
+            <Select
+              label="Viaje"
+              options={tripOptions}
               value={filters.tripId || ""}
               onChange={(e) => handleFilterChange("tripId", e.target.value)}
+            />
+            <Select
+              label="Chofer"
+              options={driverOptions}
+              value={filters.driverId || ""}
+              onChange={(e) => handleFilterChange("driverId", e.target.value)}
             />
             <Input
               label="Fecha desde"

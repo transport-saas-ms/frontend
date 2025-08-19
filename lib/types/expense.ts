@@ -61,6 +61,7 @@ export interface ExpenseFilters {
   type?: ExpenseCategory;
   tripId?: string;
   userId?: string;
+  driverId?: string; // Filtro por chofer
   startDate?: string;
   endDate?: string;
   page?: number;

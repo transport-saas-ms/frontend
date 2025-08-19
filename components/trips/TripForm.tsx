@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { TripStatusSelect } from '@/components/trips/TripStatusSelect';
+import toast from 'react-hot-toast';
 
 interface TripFormProps {
   mode?: 'create' | 'edit';
@@ -65,13 +66,13 @@ export const TripForm: React.FC<TripFormProps> = ({
     
     // Validación básica
     if (!formData.title || !formData.origin || !formData.destination || !formData.scheduledDate || !formData.driverId) {
-      alert('Por favor, complete todos los campos obligatorios');
+      toast.error('Por favor, complete todos los campos obligatorios');
       return;
     }
 
     // Validar que el usuario tenga companyId (solo para crear)
     if (mode === 'create' && !user?.companyId) {
-      alert('Error: No se puede determinar la empresa del usuario');
+      toast.error('Error: No se puede determinar la empresa del usuario');
       return;
     }
 

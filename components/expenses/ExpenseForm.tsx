@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { formatCurrency } from '@/lib/utils';
+import toast from 'react-hot-toast';
 
 interface ExpenseFormProps {
   mode?: 'create' | 'edit';
@@ -95,12 +96,12 @@ export const ExpenseForm: React.FC<ExpenseFormProps> = ({
     e.preventDefault();
     const error = validate();
     if (error) {
-      alert(error); // Mantener patrón simple (podrías cambiar a toast)
+      toast.error(error); // Mantener patrón simple (podrías cambiar a toast)
       return;
     }
 
     if (!selectedTrip) {
-      alert('No se pudo obtener datos del viaje seleccionado (driver/company).');
+      toast.error('No se pudo obtener datos del viaje seleccionado (driver/company).');
       return;
     }
 
